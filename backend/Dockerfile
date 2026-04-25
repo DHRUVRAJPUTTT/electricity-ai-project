@@ -1,24 +1,23 @@
-# 1. Use the exact Python version requested (slim variant for smaller size)
+# Use Python slim image
 FROM python:3.11.9-slim
 
-# 2. Prevent Python from writing .pyc files and keep stdout/stderr unbuffered
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# 3. Set the working directory inside the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# 4. Copy ONLY the requirements file first to leverage Docker cache
-COPY requirements.txt .
+# Copy the requirements file from the backend folder to the current directory
+COPY backend/requirements.txt .
 
-# 5. Install the dependencies (keeping the image size down)
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 6. Copy the rest of your backend files (main.py, models, scalers, etc.)
+# Copy everything else (frontend and backend folders)
 COPY . .
 
-# 7. Expose the port (adjust if your app uses a different port like 5000)
-EXPOSE 8000
+# Expose the port Hugging Face uses
+EXPOSE 7860
 
-# 8. The command to start your app
+# Move into the backend folder to run the script
+WORKDIR /app/backend
+
+# Run the application
 CMD ["python", "main.py"]
