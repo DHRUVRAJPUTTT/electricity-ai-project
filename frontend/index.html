@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -442,6 +442,713 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter') handlePredict();
   });
+</script>
+
+<script src="script.js"></script>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electricity AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #05080f;
+      --surface:   #0b1120;
+      --surface2:  #111a2e;
+      --border:    rgba(99,179,255,0.10);
+      --accent:    #3B82F6;
+      --accent2:   #06b6d4;
+      --glow:      rgba(59,130,246,0.18);
+      --glow2:     rgba(6,182,212,0.12);
+      --text:      #e8f0ff;
+      --muted:     #5a7090;
+      --danger:    #f87171;
+      --gold:      #fbbf24;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background ── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* large blurred orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.25;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    .orb1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, #1d4ed8, transparent 70%);
+      top: -140px; left: -120px;
+      animation-duration: 16s;
+    }
+    .orb2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #0e7490, transparent 70%);
+      bottom: -100px; right: -80px;
+      animation-duration: 12s;
+      animation-delay: -5s;
+    }
+    .orb3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, #7c3aed, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation-duration: 20s;
+      animation-delay: -8s;
+      opacity: 0.12;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.06); }
+    }
+
+    /* fine dot grid */
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(99,179,255,0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(145deg, var(--surface) 0%, #0d1628 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(59,130,246,0.08),
+        0 30px 80px rgba(0,0,0,0.6),
+        0 0 120px rgba(59,130,246,0.07);
+      animation: riseIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(40px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+
+    /* top accent bar */
+    .card-top-bar {
+      height: 3px;
+      background: linear-gradient(90deg, #3B82F6, #06b6d4, #7c3aed);
+      background-size: 200% 100%;
+      animation: gradShift 4s linear infinite;
+    }
+    @keyframes gradShift {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+
+    .card-inner {
+      padding: 2.2rem 2.2rem 2rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 2rem;
+    }
+
+    .icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.1));
+      border: 1px solid rgba(59,130,246,0.25);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .icon-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(99,179,255,0.15));
+    }
+    .icon-wrap svg {
+      width: 24px; height: 24px;
+      fill: var(--accent2);
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 0 6px rgba(6,182,212,0.6));
+    }
+
+    .header-text { flex: 1; padding-top: 4px; }
+
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 5px;
+      opacity: 0.8;
+    }
+
+    .title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .title span {
+      background: linear-gradient(90deg, #60a5fa, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+      margin-bottom: 1.8rem;
+    }
+
+    /* ── Fields ── */
+    .fields { display: flex; flex-direction: column; gap: 1.1rem; }
+
+    .field { position: relative; }
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .field-label svg {
+      width: 11px; height: 11px;
+      fill: var(--accent);
+      opacity: 0.7;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 16px; top: 50%;
+      transform: translateY(-50%);
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .input-icon svg {
+      width: 16px; height: 16px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.7;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 1rem;
+      padding: 13px 16px 13px 44px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    input[type="number"]:hover {
+      border-color: rgba(99,179,255,0.2);
+    }
+    input[type="number"]:focus {
+      border-color: rgba(59,130,246,0.55);
+      background: #131f38;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.10), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    input[type="number"]:focus + .input-icon svg,
+    .input-wrap:focus-within .input-icon svg { opacity: 1; }
+    input[type="number"].invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(248,113,113,0.1); }
+
+    /* value badge on the right */
+    .val-badge {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent2);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    input[type="number"]:not(:placeholder-shown) ~ .val-badge { opacity: 0.7; }
+
+    /* ── Button ── */
+    .btn-wrap { margin-top: 1.6rem; position: relative; }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 4px 24px rgba(37,99,235,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+      border-radius: inherit;
+    }
+    /* shimmer sweep on hover */
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.5s;
+    }
+    .btn:hover::after { left: 160%; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.12); }
+    .btn:active { transform: scale(0.98) translateY(0); }
+    .btn:disabled { background: #1a2540; color: var(--muted); cursor: not-allowed; box-shadow: none; }
+
+    .btn svg { width: 16px; height: 16px; fill: #fff; }
+
+    .spinner {
+      width: 17px; height: 17px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Result ── */
+    .result-box {
+      margin-top: 1.5rem;
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      animation: riseIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .result-box.visible { display: block; }
+
+    .result-inner {
+      background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(8,145,178,0.08));
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 16px;
+      padding: 1.4rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-inner::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(6,182,212,0.12), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .result-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .result-label::before {
+      content: '';
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent2);
+      box-shadow: 0 0 6px var(--accent2);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    .result-number-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .result-value {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #60a5fa, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      counter-reset: none;
+    }
+
+    .result-unit {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .result-note {
+      margin-top: 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    /* ── Error ── */
+    .error-msg {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--danger);
+      margin-top: 0.9rem;
+      background: rgba(248,113,113,0.06);
+      border: 1px solid rgba(248,113,113,0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: none;
+      line-height: 1.5;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 1.8rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px rgba(74,222,128,0.7);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .timestamp {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Floating particles ── */
+    .particles {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: rgba(99,179,255,0.4);
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) translateX(0) scale(1); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(-10vh) translateX(var(--drift)) scale(0.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="bg-layer">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Main card -->
+<div class="card">
+  <div class="card-top-bar"></div>
+  <div class="card-inner">
+
+    <div class="header">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="header-text">
+        <p class="eyebrow">⚡ Neural Forecast System</p>
+        <h1 class="title">Electricity <span>AI</span></h1>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="fields">
+
+      <div class="field">
+        <div class="field-label">
+          <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+          Temperature (°C)
+        </div>
+        <div class="input-wrap">
+          <input type="number" id="temperature" placeholder="e.g. 28" autocomplete="off" />
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+          </span>
+          <span class="val-badge">°C</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+          Humidity (%)
+        </div>
+        <div class="input-wrap">
+          <input type="number" id="humidity" placeholder="e.g. 65" min="0" max="100" autocomplete="off" />
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          </span>
+          <span class="val-badge">%</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+          Hour of Day (0–23)
+        </div>
+        <div class="input-wrap">
+          <input type="number" id="hour" placeholder="e.g. 14" min="0" max="23" autocomplete="off" />
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <span class="val-badge">hr</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="btn-wrap">
+      <button class="btn" onclick="handlePredict()" id="predict-btn">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-label">Run Prediction</span>
+      </button>
+    </div>
+
+    <p class="error-msg" id="error-msg"></p>
+
+    <div class="result-box" id="result-box">
+      <div class="result-inner">
+        <div class="result-label">Predicted Consumption</div>
+        <div class="result-number-row">
+          <div class="result-value" id="result-value">—</div>
+          <div class="result-unit">kWh</div>
+        </div>
+        <div class="result-note" id="result-note"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="status">
+        <div class="status-dot"></div>
+        Model online
+      </div>
+      <div class="timestamp" id="timestamp">—</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* ── Particles ── */
+  (function() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const left = Math.random() * 100;
+      const dur  = 8 + Math.random() * 16;
+      const delay = -Math.random() * 20;
+      const drift = (Math.random() - 0.5) * 80;
+      p.style.cssText = `left:${left}%;animation-duration:${dur}s;animation-delay:${delay}s;--drift:${drift}px;opacity:${0.2+Math.random()*0.5}`;
+      container.appendChild(p);
+    }
+  })();
+
+  /* ── Validation ── */
+  function validateInputs() {
+    const temp = document.getElementById('temperature');
+    const hum  = document.getElementById('humidity');
+    const hr   = document.getElementById('hour');
+    const errEl = document.getElementById('error-msg');
+    let valid = true;
+    [temp, hum, hr].forEach(el => el.classList.remove('invalid'));
+
+    if (temp.value === '') { temp.classList.add('invalid'); valid = false; }
+    if (hum.value === '' || +hum.value < 0 || +hum.value > 100) { hum.classList.add('invalid'); valid = false; }
+    if (hr.value === '' || +hr.value < 0 || +hr.value > 23) { hr.classList.add('invalid'); valid = false; }
+
+    if (!valid) {
+      errEl.textContent = 'Please enter valid values for all fields.';
+      errEl.classList.add('visible');
+    } else {
+      errEl.classList.remove('visible');
+    }
+    return valid;
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('predict-btn');
+    const sp  = document.getElementById('spinner');
+    const lbl = document.getElementById('btn-label');
+    btn.disabled = on;
+    sp.style.display = on ? 'block' : 'none';
+    lbl.textContent = on ? 'Analyzing…' : 'Run Prediction';
+  }
+
+  function showResult(value) {
+    const box  = document.getElementById('result-box');
+    const val  = document.getElementById('result-value');
+    const note = document.getElementById('result-note');
+    const ts   = document.getElementById('timestamp');
+
+    const num = typeof value === 'number' ? value : parseFloat(value);
+    val.textContent = isNaN(num) ? value : num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    box.classList.add('visible');
+
+    // Contextual note based on value
+    if (!isNaN(num)) {
+      if (num < 25000) note.textContent = '↓ Low demand period';
+      else if (num < 50000) note.textContent = '→ Moderate demand';
+      else note.textContent = '↑ High demand period';
+    }
+
+    const now = new Date();
+    ts.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  async function handlePredict() {
+    if (!validateInputs()) return;
+    setLoading(true);
+    document.getElementById('result-box').classList.remove('visible');
+    try {
+      const temperature = parseFloat(document.getElementById('temperature').value);
+      const humidity    = parseFloat(document.getElementById('humidity').value);
+      const hour        = parseInt(document.getElementById('hour').value);
+
+      if (typeof predict === 'function') {
+        const result = await Promise.resolve(predict(temperature, humidity, hour));
+        showResult(result);
+      } else {
+        throw new Error('predict() not found. Ensure script.js is linked.');
+      }
+    } catch (err) {
+      const errEl = document.getElementById('error-msg');
+      errEl.textContent = err.message || 'Prediction failed. Please try again.';
+      errEl.classList.add('visible');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handlePredict(); });
 </script>
 
 <script src="script.js"></script>
